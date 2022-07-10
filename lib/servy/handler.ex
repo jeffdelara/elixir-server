@@ -1,6 +1,15 @@
 require Logger
 
 defmodule Servy.Handler do
+  @pages_path Path.expand("../../pages", __DIR__)
+  
+  @moduledoc """
+  This is a simple webserver
+  """
+
+  @doc """
+  main handler of the request
+  """
   def handle(request) do
     request
     |> parse
@@ -42,7 +51,7 @@ defmodule Servy.Handler do
   end
 
   def route(%{ method: "GET", path: "/about"} = conv) do
-    Path.expand("../../pages", __DIR__)
+    @pages_path
       |> Path.join("about.html")
       |> File.read
       |> handle_file(conv)
@@ -68,7 +77,7 @@ defmodule Servy.Handler do
   end
 
   def route(%{ method: "GET", path: "/bears/new" } = conv) do
-    Path.expand("../../pages", __DIR__)
+    @pages_path
     |> Path.join("form.html")
     |> File.read
     |> handle_file(conv)
@@ -79,7 +88,7 @@ defmodule Servy.Handler do
   end
   
   def route(%{ method: "GET", path: "/pages/" <> file} = conv) do
-    Path.expand("../../pages", __DIR__)
+    @pages_path
     |> Path.join(file <> ".html")
     |> File.read
     |> handle_file(conv)
