@@ -1,8 +1,10 @@
 require Logger
 
 defmodule Servy.Handler do
-  @pages_path Path.expand("../../pages", __DIR__)
+  @pages_path Path.expand("pages", File.cwd!)
   
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]
+  import Servy.Parser, only: [parse: 1]
   @moduledoc """
   This is a simple webserver
   """
@@ -20,23 +22,9 @@ defmodule Servy.Handler do
     |> format_response    
   end
 
-  def parse(request) do
-    [method, path, _] = 
-      request 
-      |> String.split("\n")
-      |> List.first
-      |> String.split(" ")
+  
 
-    %{ method: method, status: nil, path: path, resp_body: "" }
-  end
-
-  def rewrite_path(%{path: "/wildlife"} = conv) do
-    %{ conv | path: "/wildthings" }
-  end
-
-  def rewrite_path(conv), do: conv
-
-  def log(conv), do: IO.inspect(conv)
+  
 
   def handle_file({:ok, content}, conv) do
     %{ conv | status: 200, resp_body: content }
@@ -102,12 +90,7 @@ defmodule Servy.Handler do
     %{ conv | status: 200 }
   end
 
-  def track(%{status: 404, path: path} = conv) do
-    Logger.info "Warning: #{path} can not be found."
-    conv
-  end
-
-  def track(conv), do: conv
+  
   
   def format_response(conv) do
     """
@@ -132,7 +115,7 @@ defmodule Servy.Handler do
 end
 
 request = """
-GET /pages/contact HTTP/1.1
+GET /pages/faq HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
