@@ -5,6 +5,7 @@ defmodule Servy.Handler do
   import Servy.Parser, only: [parse: 1]
 
   alias Servy.Conv
+  alias Servy.BearController
 
   @moduledoc """
   This is a simple webserver
@@ -40,17 +41,6 @@ defmodule Servy.Handler do
       |> Path.join("about.html")
       |> File.read
       |> handle_file(conv)
-      
-    # case File.read(file) do
-    #   {:ok, content} ->
-    #     %{ conv | status: 200, resp_body: content }
-
-    #   {:error, :enoent} ->
-    #     %{ conv | status: 404, resp_body: "File not found" }
-
-    #   {:error, reason} ->
-    #     %{ conv | status: 500, resp_body: "File error: #{reason}"}
-    # end
   end
 
   def route(%Conv{ method: "GET", path: "/wildthings" } = conv) do
@@ -58,7 +48,7 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{ method: "GET", path: "/bears" } = conv) do
-    %Conv{ conv | status: 200, resp_body: "Bear grills?" }
+    BearController.index(conv)
   end
 
   def route(%Conv{ method: "GET", path: "/bears/new" } = conv) do
@@ -69,11 +59,12 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{ method: "POST", path: "/bears"} = conv) do
-    %Conv{ conv | status: 201, resp_body: "Created a #{conv.params["type"]} with name #{conv.params["name"]}" }
+    BearController.create(conv, conv.params)
   end
 
   def route(%Conv{ method: "GET", path: "/bears/" <> id } = conv) do
-    %Conv{ conv | status: 200, resp_body: "#{id} First bear" }
+    params = Map.put(conv.params, "id", id)
+    BearController.show(conv, params)
   end
   
   def route(%Conv{ method: "GET", path: "/pages/" <> file} = conv) do
@@ -115,7 +106,7 @@ end
 # """
 
 request = """
-POST /bears HTTP/1.1
+GET /bears HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
