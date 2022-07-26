@@ -106,7 +106,7 @@ end
 # """
 
 request = """
-GET /bears HTTP/1.1
+GET /bears/3 HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
