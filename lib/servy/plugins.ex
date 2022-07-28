@@ -9,10 +9,17 @@ defmodule Servy.Plugins do
 
   def rewrite_path(%Conv{} = conv), do: conv
 
-  def log(%Conv{} = conv), do: IO.inspect(conv)
+  def log(%Conv{} = conv) do
+    if Mix.env == :dev do
+      IO.inspect(conv)
+    end
+    conv
+  end
 
   def track(%Conv{status: 404, path: path} = conv) do
-    Logger.info "Warning: #{path} can not be found."
+    if Mix.env != :test do
+      Logger.info "Warning: #{path} can not be found."
+    end
     conv
   end
 
